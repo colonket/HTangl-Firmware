@@ -1,14 +1,14 @@
-#ifndef MELEE18BUTTON_H_NI7QLO5Z
-#define MELEE18BUTTON_H_NI7QLO5Z
+#ifndef NASB_H_HADOENASB
+#define NASB_H_HADOENASB
 
 #include "core/CommunicationBackend.h"
 #include "core/ControllerMode.h"
 #include "core/socd.h"
 #include "core/state.h"
 
-class Melee18Button : public ControllerMode {
+class Nasb : public ControllerMode {
 public:
-  Melee18Button(socd::SocdType socdType, state::InputState &rInputState,
+  Nasb(socd::SocdType socdType, state::InputState &rInputState,
                 CommunicationBackend *communicationBackend);
   virtual void UpdateDigitalOutputs();
   virtual void UpdateAnalogOutputs();
@@ -18,4 +18,4 @@ private:
   void HandleSocd();
 };
 
-#endif /* end of include guard: MELEE18BUTTON_H_NI7QLO5Z */
+#endif /* end of include guard: NASB_H_HADOENASB */

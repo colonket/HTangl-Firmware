@@ -18,20 +18,20 @@ void FgcMode::UpdateDigitalOutputs() {
   mOutputState.dpadLeft = mrInputState.left;
   mOutputState.dpadRight = mrInputState.right;
   mOutputState.dpadDown = mrInputState.down;
-  mOutputState.dpadUp = mrInputState.mod_x || mrInputState.c_up;
+  mOutputState.dpadUp = mrInputState.mod_x || mrInputState.a;
 
   // Menu keys
   mOutputState.start = mrInputState.start;
-  mOutputState.select = mrInputState.c_left;
-  mOutputState.home = mrInputState.c_down;
+  mOutputState.select = mrInputState.select;
+  mOutputState.home = mrInputState.home;
 
-  // Right hand bottom row
+  // Right hand top row (home row)
   mOutputState.a = mrInputState.b;
   mOutputState.b = mrInputState.x;
   mOutputState.triggerRDigital = mrInputState.z;
   mOutputState.triggerLDigital = mrInputState.up;
 
-  // Right hand top row
+  // Right hand bottom row
   mOutputState.x = mrInputState.r;
   mOutputState.y = mrInputState.y;
   mOutputState.buttonR = mrInputState.lightshield;

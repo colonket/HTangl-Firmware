@@ -5,26 +5,26 @@ DefaultKeyboardMode::DefaultKeyboardMode(socd::SocdType socdType,
     : KeyboardMode(socdType, rInputState) {}
 
 void DefaultKeyboardMode::SendKeys() {
-  Press('a', mrInputState.l);
-  Press('b', mrInputState.left);
-  Press('c', mrInputState.down);
+  Press('q', mrInputState.l);
+  Press('a', mrInputState.left);
+  Press('s', mrInputState.down);
   Press('d', mrInputState.right);
-  Press('e', mrInputState.mod_x);
-  Press('f', mrInputState.mod_y);
-  Press('g', mrInputState.select);
-  Press('h', mrInputState.start);
-  Press('i', mrInputState.home);
-  Press('j', mrInputState.r);
-  Press('k', mrInputState.y);
-  Press('l', mrInputState.lightshield);
-  Press('m', mrInputState.midshield);
-  Press('n', mrInputState.b);
-  Press('o', mrInputState.x);
-  Press('p', mrInputState.z);
-  Press('q', mrInputState.up);
-  Press('r', mrInputState.c_up);
-  Press('s', mrInputState.c_left);
-  Press('t', mrInputState.c_right);
-  Press('u', mrInputState.a);
-  Press('v', mrInputState.c_down);
+  Press('w', mrInputState.mod_x);
+  Press('e', mrInputState.mod_y);
+  Press('z', mrInputState.select);
+  Press('x', mrInputState.start);
+  Press('c', mrInputState.home);
+  Press('u', mrInputState.b);
+  Press('i', mrInputState.x);
+  Press('o', mrInputState.z);
+  Press('p', mrInputState.up);
+  Press('h', mrInputState.r);
+  Press('j', mrInputState.y);
+  Press('k', mrInputState.lightshield);
+  Press('l', mrInputState.midshield);
+  Press('5', mrInputState.a);
+  Press('8', mrInputState.c_up);
+  Press('4', mrInputState.c_left);
+  Press('6', mrInputState.c_right);
+  Press('2', mrInputState.c_down);
 }

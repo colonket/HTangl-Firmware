@@ -26,29 +26,22 @@ void Melee20Button::UpdateDigitalOutputs() {
   mOutputState.a = mrInputState.a;
   mOutputState.b = mrInputState.b;
   mOutputState.x = mrInputState.x;
-  mOutputState.y = mrInputState.y;
   mOutputState.buttonR = mrInputState.z;
-  if (mrInputState.nunchuk_connected) {
-    mOutputState.triggerLDigital = mrInputState.nunchuk_z;
-  } else {
-    mOutputState.triggerLDigital = mrInputState.l;
-  }
   mOutputState.triggerRDigital = mrInputState.r;
+  mOutputState.y = mrInputState.y;
+  mOutputState.triggerLDigital = mrInputState.l;
   mOutputState.start = mrInputState.start;
+  mOutputState.dpadLeft = mrInputState.select;
+  mOutputState.dpadRight = mrInputState.home;
 
-  // D-Pad layer can be activated by holding Mod X + Mod Y, or by holding the C
-  // button on a nunchuk.
-  if ((mrInputState.mod_x && mrInputState.mod_y) || mrInputState.nunchuk_c) {
+  // D-Pad layer can be activated by holding Mod X + Mod Y
+  if (mrInputState.mod_x && mrInputState.mod_y) 
+  {
     mOutputState.dpadUp = mrInputState.c_up;
     mOutputState.dpadDown = mrInputState.c_down;
     mOutputState.dpadLeft = mrInputState.c_left;
     mOutputState.dpadRight = mrInputState.c_right;
   }
-
-  if (mrInputState.select)
-    mOutputState.dpadLeft = true;
-  if (mrInputState.home)
-    mOutputState.dpadRight = true;
 }
 
 void Melee20Button::UpdateAnalogOutputs() {
@@ -174,14 +167,9 @@ void Melee20Button::UpdateAnalogOutputs() {
       mOutputState.leftStickX = 128 + (mVectorState.directionX * 25);
       mOutputState.leftStickY = 128 + (mVectorState.directionY * 59);
       if (shield_button_pressed) {
-        // MY + L, R, LS, and MS + q1/2 = 4750 8750 = 38 70
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 38);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 70);
-        // MY + L, R, LS, and MS + q3/4 = 5000 8500 = 40 68
-        if (mVectorState.directionY == -1) {
-          mOutputState.leftStickX = 128 + (mVectorState.directionX * 40);
-          mOutputState.leftStickY = 128 + (mVectorState.directionY * 68);
-        }
+        // MY + L, R, LS, and MS + q1/2/3/4 = 5000 8500 = 40 68
+        mOutputState.leftStickX = 128 + (mVectorState.directionX * 40);
+        mOutputState.leftStickY = 128 + (mVectorState.directionY * 68);
       }
     }
 

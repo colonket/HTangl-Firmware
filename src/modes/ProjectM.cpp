@@ -29,24 +29,22 @@ void ProjectM::UpdateDigitalOutputs() {
   mOutputState.a = mrInputState.a;
   mOutputState.b = mrInputState.b;
   mOutputState.x = mrInputState.x;
-  mOutputState.y = mrInputState.y;
-  // True Z press vs macro lightshield + A.
-  if (mTrueZPress || mrInputState.mod_x) {
-    mOutputState.buttonR = mrInputState.z;
-  } else {
-    mOutputState.a = mrInputState.a || mrInputState.z;
-  }
-  if (mrInputState.nunchuk_connected) {
-    mOutputState.triggerLDigital = mrInputState.nunchuk_z;
-  } else {
-    mOutputState.triggerLDigital = mrInputState.l;
-  }
   mOutputState.triggerRDigital = mrInputState.r;
+  mOutputState.y = mrInputState.y;
+  mOutputState.triggerLDigital = mrInputState.l;
   mOutputState.start = mrInputState.start;
+  mOutputState.dpadLeft = mrInputState.select;
+  mOutputState.dpadRight = mrInputState.home;
 
-  // D-Pad layer can be activated by holding Mod X + Mod Y, or by holding the C
-  // button on a nunchuk.
-  if ((mrInputState.mod_x && mrInputState.mod_y) || mrInputState.nunchuk_c) {
+  // True Z press vs macro lightshield + A.
+  if (mTrueZPress || mrInputState.mod_x) 
+  {mOutputState.buttonR = mrInputState.z;} 
+  else 
+  {mOutputState.a = mrInputState.a || mrInputState.z;}
+
+  // D-Pad layer can be activated by holding Mod X + Mod Y
+  if (mrInputState.mod_x && mrInputState.mod_y) 
+  {
     mOutputState.dpadUp = mrInputState.c_up;
     mOutputState.dpadDown = mrInputState.c_down;
     mOutputState.dpadLeft = mrInputState.c_left;
@@ -56,11 +54,6 @@ void ProjectM::UpdateDigitalOutputs() {
   // Don't override dpad up if it's already pressed using the MX + MY dpad
   // layer.
   mOutputState.dpadUp = mOutputState.dpadUp || mrInputState.midshield;
-
-  if (mrInputState.select)
-    mOutputState.dpadLeft = true;
-  if (mrInputState.home)
-    mOutputState.dpadRight = true;
 }
 
 void ProjectM::UpdateAnalogOutputs() {
