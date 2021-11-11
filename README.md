@@ -12,8 +12,6 @@ Many features have been removed/added/modified to make the firmware more
 straightforward to use on HTangl controllers.
 
 For a detailed guide on editing and uploading this firmware please
-check out the HTangl YouTube channel 
-https://www.youtube.com/channel/UCIHJYzL-LAS2CVR-Q0J305w
+check out the [HTangl YouTube channel](https://www.youtube.com/channel/UCIHJYzL-LAS2CVR-Q0J305w)
 
-Also check out Haystacks github page for more details on how the firmware works
-https://github.com/JonnyHaystack/HayB0XX
+Also check out [Haystacks github page](https://github.com/JonnyHaystack/HayB0XX) for more details on how the firmware works
