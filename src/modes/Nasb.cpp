@@ -30,7 +30,7 @@ void Nasb::UpdateDigitalOutputs()
   mOutputState.y = mrInputState.x || mrInputState.y;
   mOutputState.x = mrInputState.z;
   mOutputState.triggerRDigital = mrInputState.r || mrInputState.l;
-  mOutputState.buttonR = mrInputState.midshield;
+  mOutputState.buttonR = mrInputState.lightshield;
   mOutputState.triggerLDigital = mrInputState.mod_x; 
   mOutputState.start = mrInputState.start;
   mOutputState.dpadUp = mrInputState.select || mrInputState.home;
