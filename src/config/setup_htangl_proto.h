@@ -12,6 +12,7 @@
 #include "modes/Melee20Button.h"
 #include "modes/ProjectM.h"
 #include "modes/Ultimate.h"
+#include "modes/RoA.h"
 #include "modes/Nasb.h"
 
 CommunicationBackend *gCurrentBackend;

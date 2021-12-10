@@ -21,11 +21,11 @@ RoA::RoA(socd::SocdType socdType,
 void RoA::UpdateDigitalOutputs() {
   mOutputState.b = mrInputState.a;
   mOutputState.a = mrInputState.b;
-  mOutputState.x = mrInputState.x;
-  mOutputState.y = mrInputState.y;
-  mOutputState.buttonR = mrInputState.z;
-  mOutputState.triggerLDigital = mrInputState.l;
-  mOutputState.triggerRDigital = mrInputState.r;
+  mOutputState.y = mrInputState.x;
+  mOutputState.x = mrInputState.y;
+  mOutputState.triggerRDigital = mrInputState.z;
+  mOutputState.buttonL = mrInputState.l;
+  mOutputState.triggerLDigital = mrInputState.r;
   mOutputState.start = mrInputState.start;
   mOutputState.dpadUp = mrInputState.select || mrInputState.home;
   
