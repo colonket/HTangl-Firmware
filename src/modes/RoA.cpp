@@ -26,8 +26,10 @@ void RoA::UpdateDigitalOutputs() {
   mOutputState.triggerRDigital = mrInputState.z;
   mOutputState.buttonL = mrInputState.l;
   mOutputState.triggerLDigital = mrInputState.r;
+  mOutputState.buttonR = mrInputState.lightshield;
   mOutputState.start = mrInputState.start;
-  mOutputState.dpadUp = mrInputState.select || mrInputState.home;
+  mOutputState.select = mrInputState.select;
+  mOutputState.home = mrInputState.home;
   
   // D-Pad layer can be activated by holding Mod X + Mod Y
   if (mrInputState.mod_x && mrInputState.mod_y) 
