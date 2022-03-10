@@ -1,7 +1,7 @@
-#ifndef SETUP_HTANGL_PROTO_H_HADOE
-#define SETUP_HTANGL_PROTO_H_HADOE
+#ifndef SETUP_HTANGL_V2_H_HADOE
+#define SETUP_HTANGL_V2_H_HADOE
 
-#include "pinout_htangl_proto.h"
+#include "pinout_htangl_v2.h"
 
 #include "core/CommunicationBackend.h"
 #include "core/InputMode.h"
@@ -48,4 +48,4 @@ void initialise() {
       new Melee20Button(socd::SOCD_2IP_NO_REAC, gInputState, gCurrentBackend);
 }
 
-#endif /* end of include guard: SETUP_HTANGL_PROTO_H_HADOE */
+#endif /* end of include guard: SETUP_HTANGL_V2_H_HADOE */

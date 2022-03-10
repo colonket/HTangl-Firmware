@@ -1,5 +1,5 @@
-#ifndef SETUP_HTANGL_V1_H_HADOE2
-#define SETUP_HTANGL_V1_H_HADOE2
+#ifndef SETUP_HTANGL_V1_H_HADOE
+#define SETUP_HTANGL_V1_H_HADOE
 
 #include "pinout_htangl_v1.h"
 
@@ -20,15 +20,26 @@ InputMode *gCurrentMode;
 state::InputState gInputState;
 
 void initialise() {
-  // Hold C-Down on plugin for Gamecube/Wii backend
-  if (gInputState.c_down) {gCurrentBackend = new GamecubeBackend(125, pinout::GCC_DATA);} 
-  // Hold A for GC adapater backend
-  else if (gInputState.a) {gCurrentBackend = new GamecubeBackend(0, pinout::GCC_DATA);} 
-  
-  else {
-    gCurrentBackend = new DInputBackend();
-    // Input viewer only used when connected to PC i.e. when using DInput mode.
+  gCurrentBackend = new DInputBackend();
+
+  delay(500);
+
+  bool usb_connected = UDADDR & _BV(ADDEN);
+
+  if (usb_connected) 
+  {
+    // Default to DInput mode
+    // Input viewer only used when connected to PC i.e. when using DInput mode
     Serial.begin(115200, SERIAL_8N1);
+  }
+  else
+  {
+  delete gCurrentBackend;
+  // Hold A for GC adapater backend, otherwise default to GC/Wii backend
+  if (gInputState.a)
+  {gCurrentBackend = new GamecubeBackend(0, pinout::GCC_DATA);}
+  else
+  {gCurrentBackend = new GamecubeBackend(125, pinout::GCC_DATA);}
   }
 
   /* Always start in Melee mode. Must set mode only after initialising the
@@ -37,4 +48,4 @@ void initialise() {
       new Melee20Button(socd::SOCD_2IP_NO_REAC, gInputState, gCurrentBackend);
 }
 
-#endif /* end of include guard: SETUP_HTANGL_V1_H_HADOE2 */
+#endif /* end of include guard: SETUP_HTANGL_V1_H_HADOE */

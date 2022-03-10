@@ -1,5 +1,5 @@
-#ifndef PINOUT_HTANGL_V1_H_HADOE02
-#define PINOUT_HTANGL_V1_H_HADOE02
+#ifndef PINOUT_HTANGL_V1_H_HADOE
+#define PINOUT_HTANGL_V1_H_HADOE
 
 // Changing pin assignments will change button assignments for all game modes.
 // Do not change the GCC_Data pin
@@ -36,4 +36,4 @@ enum pinout {
 };
 } // namespace pinout
 
-#endif /* end of include guard: PINOUT_HTANGL_V1_H_HADOE02 */
+#endif /* end of include guard: PINOUT_HTANGL_V1_H_HADOE */

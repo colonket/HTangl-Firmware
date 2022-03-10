@@ -10,7 +10,7 @@
     Zac Staples' Arduino_Vector library
 */
 
-#define NUNCHUK_ENABLE false
+#define NUNCHUK_ENABLE true
 
 #include <Arduino.h>
 
@@ -69,10 +69,9 @@ void readInputs() {
   gInputState.c_left = (digitalRead(pinout::CLEFT) == LOW);
   gInputState.c_up = (digitalRead(pinout::CUP) == LOW);
 
-  // Nunchuk inputs.
+// Nunchuk inputs
 #if NUNCHUK_ENABLE  
-  if (gNunchuk.update()) {
-    gInputState.nunchuk_connected = true;
+  if (gInputState.nunchuk_connected && gNunchuk.update()) {
     gInputState.nunchuk_x = gNunchuk.joyX();
     gInputState.nunchuk_y = gNunchuk.joyY();
     gInputState.nunchuk_c = gNunchuk.buttonC();
@@ -83,8 +82,13 @@ void readInputs() {
 
 void setup() {
 #if NUNCHUK_ENABLE
+delay(50);
     gNunchuk.begin();
-    gNunchuk.connect();
+    if (gNunchuk.connect()) {
+      gInputState.nunchuk_connected = true;
+    } else {
+      gNunchuk.i2c().end();
+    }
 #endif
 
   pinMode(pinout::L, INPUT_PULLUP);
