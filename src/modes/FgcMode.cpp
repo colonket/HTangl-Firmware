@@ -26,16 +26,16 @@ void FgcMode::UpdateDigitalOutputs() {
   mOutputState.home = mrInputState.home;
 
   // Right hand top row (home row)
-  mOutputState.a = mrInputState.b;
-  mOutputState.b = mrInputState.x;
-  mOutputState.triggerRDigital = mrInputState.z;
-  mOutputState.triggerLDigital = mrInputState.up;
+  mOutputState.x = mrInputState.b;
+  mOutputState.y = mrInputState.x;
+  mOutputState.buttonR = mrInputState.z;
+  mOutputState.buttonL = mrInputState.up;
 
   // Right hand bottom row
-  mOutputState.x = mrInputState.r;
-  mOutputState.y = mrInputState.y;
-  mOutputState.buttonR = mrInputState.lightshield;
-  mOutputState.buttonL = mrInputState.midshield;
+  mOutputState.a = mrInputState.r;
+  mOutputState.b = mrInputState.y;
+  mOutputState.triggerRDigital = mrInputState.lightshield;
+  mOutputState.triggerLDigital = mrInputState.midshield;
 }
 
 void FgcMode::UpdateAnalogOutputs() {
