@@ -1,30 +1,31 @@
-#include "DefaultKeyboardMode.h"
+#include "modes/DefaultKeyboardMode.hpp"
 
-DefaultKeyboardMode::DefaultKeyboardMode(socd::SocdType socdType,
-                                         state::InputState &rInputState)
-    : KeyboardMode(socdType, rInputState) {}
+#include "core/socd.hpp"
+#include "core/state.hpp"
 
-void DefaultKeyboardMode::SendKeys() {
-  Press('q', mrInputState.l);
-  Press('a', mrInputState.left);
-  Press('s', mrInputState.down);
-  Press('d', mrInputState.right);
-  Press('w', mrInputState.mod_x);
-  Press('e', mrInputState.mod_y);
-  Press('z', mrInputState.select);
-  Press('x', mrInputState.start);
-  Press('c', mrInputState.home);
-  Press('u', mrInputState.b);
-  Press('i', mrInputState.x);
-  Press('o', mrInputState.z);
-  Press('p', mrInputState.up);
-  Press('h', mrInputState.r);
-  Press('j', mrInputState.y);
-  Press('k', mrInputState.lightshield);
-  Press('l', mrInputState.midshield);
-  Press('5', mrInputState.a);
-  Press('8', mrInputState.c_up);
-  Press('4', mrInputState.c_left);
-  Press('6', mrInputState.c_right);
-  Press('2', mrInputState.c_down);
+DefaultKeyboardMode::DefaultKeyboardMode(socd::SocdType socd_type) : KeyboardMode(socd_type) {}
+
+void DefaultKeyboardMode::UpdateKeys(InputState &inputs) {
+    Press(HID_KEY_Q, inputs.l);
+    Press(HID_KEY_A, inputs.left);
+    Press(HID_KEY_S, inputs.down);
+    Press(HID_KEY_D, inputs.right);
+    Press(HID_KEY_W, inputs.mod_x);
+    Press(HID_KEY_E, inputs.mod_y);
+    Press(HID_KEY_Z, inputs.select);
+    Press(HID_KEY_X, inputs.start);
+    Press(HID_KEY_C, inputs.home);
+    Press(HID_KEY_H, inputs.r);
+    Press(HID_KEY_J, inputs.y);
+    Press(HID_KEY_K, inputs.lightshield);
+    Press(HID_KEY_L, inputs.midshield);
+    Press(HID_KEY_U, inputs.b);
+    Press(HID_KEY_I, inputs.x);
+    Press(HID_KEY_O, inputs.z);
+    Press(HID_KEY_P, inputs.up);
+    Press(HID_KEY_8, inputs.c_up);
+    Press(HID_KEY_4, inputs.c_left);
+    Press(HID_KEY_6, inputs.c_right);
+    Press(HID_KEY_5, inputs.a);
+    Press(HID_KEY_2, inputs.c_down);
 }

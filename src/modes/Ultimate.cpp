@@ -1,283 +1,286 @@
 /* Ultimate profile by Taker */
-#include "Ultimate.h"
+#include "modes/Ultimate.hpp"
 
 #define ANALOG_STICK_MIN 28
 #define ANALOG_STICK_NEUTRAL 128
 #define ANALOG_STICK_MAX 228
 
-Ultimate::Ultimate(socd::SocdType socdType,
-                             state::InputState &rInputState,
-                             CommunicationBackend *communicationBackend)
-    : ControllerMode(socdType, rInputState, communicationBackend) {
-  mSocdPairs.push_back(socd::SocdPair{&rInputState.left, &rInputState.right});
-  mSocdPairs.push_back(socd::SocdPair{&rInputState.down, &rInputState.up});
-  mSocdPairs.push_back(
-      socd::SocdPair{&rInputState.c_left, &rInputState.c_right});
-  mSocdPairs.push_back(socd::SocdPair{&rInputState.c_down, &rInputState.c_up});
-
-  mHorizontalSocd = false;
+Ultimate::Ultimate(socd::SocdType socd_type) : ControllerMode(socd_type) {
+    _socd_pair_count = 4;
+    _socd_pairs = new socd::SocdPair[_socd_pair_count]{
+        socd::SocdPair{&InputState::left,    &InputState::right  },
+        socd::SocdPair{ &InputState::down,   &InputState::up     },
+        socd::SocdPair{ &InputState::c_left, &InputState::c_right},
+        socd::SocdPair{ &InputState::c_down, &InputState::c_up   },
+    };
 }
 
-void Ultimate::HandleSocd() {
-  mHorizontalSocd = mrInputState.left && mrInputState.right;
-  InputMode::HandleSocd();
+void Ultimate::UpdateDigitalOutputs(InputState &inputs, OutputState &outputs) {
+    outputs.a = inputs.a;
+    outputs.b = inputs.b;
+    outputs.x = inputs.x;
+    outputs.y = inputs.y;
+    outputs.buttonR = inputs.z;
+    outputs.buttonL = inputs.lightshield;
+    outputs.triggerRDigital = inputs.r;
+    outputs.start = inputs.start;
+    outputs.select = inputs.select;
+    outputs.home = inputs.home;
+
+    // If nunchuk is connected disable L and assign it to the Nunchuk Z button
+    if (inputs.nunchuk_connected) 
+    {outputs.triggerLDigital = inputs.nunchuk_z;} 
+    else 
+    {outputs.triggerLDigital = inputs.l;}
+
+    // D-Pad layer can be activated by holding Mod X + Mod Y, or by holding the C
+    // button on a nunchuk.
+    if ((inputs.mod_x && inputs.mod_y) || inputs.nunchuk_c) 
+    {
+        outputs.dpadUp = inputs.c_up;
+        outputs.dpadDown = inputs.c_down;
+        outputs.dpadLeft = inputs.c_left;
+        outputs.dpadRight = inputs.c_right;
+    }
 }
 
-void Ultimate::UpdateDigitalOutputs() {
-  mOutputState.a = mrInputState.a;
-  mOutputState.b = mrInputState.b;
-  mOutputState.x = mrInputState.x;
-  mOutputState.y = mrInputState.y;
-  mOutputState.buttonR = mrInputState.z;
-  mOutputState.triggerLDigital = mrInputState.l;
-  mOutputState.start = mrInputState.start;
-  mOutputState.dpadUp = mrInputState.select || mrInputState.home;
+void Ultimate::UpdateAnalogOutputs(InputState &inputs, OutputState &outputs) {
+    // Coordinate calculations to make modifier handling simpler.
+    UpdateDirections(
+        inputs.left,
+        inputs.right,
+        inputs.down,
+        inputs.up,
+        inputs.c_left,
+        inputs.c_right,
+        inputs.c_down,
+        inputs.c_up,
+        ANALOG_STICK_MIN,
+        ANALOG_STICK_NEUTRAL,
+        ANALOG_STICK_MAX,
+        outputs
+    );
 
-  if (mrInputState.nunchuk_connected) 
-  {mOutputState.triggerLDigital = mrInputState.nunchuk_z;} 
-  else 
-  {mOutputState.triggerLDigital = mrInputState.l;}
+    bool shield_button_pressed = inputs.l || inputs.r || inputs.lightshield || inputs.midshield;
 
-  // D-Pad layer can be activated by holding Mod X + Mod Y
-  // or by holding the C button on a nunchuk.
-  if ((mrInputState.mod_x && mrInputState.mod_y) || mrInputState.nunchuk_c)  
-  {
-    mOutputState.dpadUp = mrInputState.c_up;
-    mOutputState.dpadDown = mrInputState.c_down;
-    mOutputState.dpadLeft = mrInputState.c_left;
-    mOutputState.dpadRight = mrInputState.c_right;
-  }
-}
-
-void Ultimate::UpdateAnalogOutputs() {
-  // Coordinate calculations to make modifier handling simpler.
-  HandleVectors(mrInputState.left, mrInputState.right, mrInputState.down,
-                mrInputState.up, mrInputState.c_left, mrInputState.c_right,
-                mrInputState.c_down, mrInputState.c_up, ANALOG_STICK_MIN,
-                ANALOG_STICK_NEUTRAL, ANALOG_STICK_MAX);
-
-  bool shield_button_pressed = mrInputState.l || mrInputState.r ||
-                               mrInputState.lightshield ||
-                               mrInputState.midshield;
-
-  if (mrInputState.mod_x) {
-    // MX + Horizontal = 6625 = 53
-    if (mVectorState.horizontal) {
-      mOutputState.leftStickX = 128 + (mVectorState.directionX * 53);
-      // Horizontal Shield tilt = 51
-      if (shield_button_pressed) {
-      mOutputState.leftStickX = 128 + (mVectorState.directionX * 51);
-      }
-      // Horizontal Tilts = 36
-      if (mrInputState.a) {
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 36);
-      }
-    }
-    // MX + Vertical = 44
-    if (mVectorState.vertical) {
-      mOutputState.leftStickY = 128 + (mVectorState.directionY * 44);
-      // Vertical Shield Tilt = 51
-      if (shield_button_pressed) {
-      mOutputState.leftStickY = 128 + (mVectorState.directionY * 51);
-      }
-    }
-    if (mVectorState.diagonal) {
-      // MX + q1/2/3/4 = 53 35
-      mOutputState.leftStickX = 128 + (mVectorState.directionX * 53);
-      mOutputState.leftStickY = 128 + (mVectorState.directionY * 35);
-      if (shield_button_pressed) {
-        // MX + L, R, LS, and MS + q1/2/3/4 = 6375 3750 = 51 30
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 51);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 30);
-      }
-    }
-
-    // Angled fsmash/ftilt with C-Stick + MX
-    if (mVectorState.directionCX != 0) {
-      mOutputState.rightStickX = 128 + (mVectorState.directionCX * 127);
-      mOutputState.rightStickY = 128 + (mVectorState.directionY * 59);
-    }
-
-    /* Up B angles */
-    if (mVectorState.diagonal && !shield_button_pressed) {
-      // (33.44) = 53 35
-      mOutputState.leftStickX = 128 + (mVectorState.directionX * 53);
-      mOutputState.leftStickY = 128 + (mVectorState.directionY * 35);
-      // (39.05) = 53 43
-      if (mrInputState.c_down) {
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 53);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 43);
-      }
-      // (36.35) = 53 39
-      if (mrInputState.c_left) {
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 53);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 39);
-      }
-      // (30.32) = 56 41
-      if (mrInputState.c_up) {
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 53);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 31);
-      }
-      // (27.85) = 49 42
-      if (mrInputState.c_right) {
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 53);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 28);
-      }
-
-      /* Extended Up B Angles */
-      if (mrInputState.b) {
-        // (33.29) = 67 44
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 67);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 44);
-        // (39.38) = 67 55
-        if (mrInputState.c_down) {
-          mOutputState.leftStickX = 128 + (mVectorState.directionX * 67);
-          mOutputState.leftStickY = 128 + (mVectorState.directionY * 55);
+    if (inputs.mod_x) {
+        // MX + Horizontal = 6625 = 53
+        if (directions.horizontal) {
+            outputs.leftStickX = 128 + (directions.x * 53);
+            // Horizontal Shield tilt = 51
+            if (shield_button_pressed) {
+                outputs.leftStickX = 128 + (directions.x * 51);
+            }
+            // Horizontal Tilts = 36
+            if (inputs.a) {
+                outputs.leftStickX = 128 + (directions.x * 36);
+            }
         }
-        // (36.18) = 67 49
-        if (mrInputState.c_left) {
-          mOutputState.leftStickX = 128 + (mVectorState.directionX * 67);
-          mOutputState.leftStickY = 128 + (mVectorState.directionY * 49);
+        // MX + Vertical = 44
+        if (directions.vertical) {
+            outputs.leftStickY = 128 + (directions.y * 44);
+            // Vertical Shield Tilt = 51
+            if (shield_button_pressed) {
+                outputs.leftStickY = 128 + (directions.y * 51);
+            }
         }
-        // (30.2) = 67 39
-        if (mrInputState.c_up) {
-          mOutputState.leftStickX = 128 + (mVectorState.directionX * 67);
-          mOutputState.leftStickY = 128 + (mVectorState.directionY * 39);
+        if (directions.diagonal) {
+            // MX + q1/2/3/4 = 53 35
+            outputs.leftStickX = 128 + (directions.x * 53);
+            outputs.leftStickY = 128 + (directions.y * 35);
+            if (shield_button_pressed) {
+                // MX + L, R, LS, and MS + q1/2/3/4 = 6375 3750 = 51 30
+                outputs.leftStickX = 128 + (directions.x * 51);
+                outputs.leftStickY = 128 + (directions.y * 30);
+            }
         }
-        // (27.58) = 67 35
-        if (mrInputState.c_right) {
-          mOutputState.leftStickX = 128 + (mVectorState.directionX * 67);
-          mOutputState.leftStickY = 128 + (mVectorState.directionY * 35);
-        }
-      }
-      
-      // Angled Ftilts
-      if (mrInputState.a) {
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 36);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 26);
-      }
-    }
-  }
 
-  if (mrInputState.mod_y) {
-    // MY + Horizontal (even if shield is held) = 41
-    if (mVectorState.horizontal) {
-      mOutputState.leftStickX = 128 + (mVectorState.directionX * 41);
-      // MY Horizontal Tilts
-      if (mrInputState.a) {
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 36);
-      }
-    }
-    // MY + Vertical (even if shield is held) = 53
-    if (mVectorState.vertical) {
-      mOutputState.leftStickY = 128 + (mVectorState.directionY * 53);
-      // MY Vertical Tilts
-      if (mrInputState.a) {
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 36);
-      }
-    }
-    if (mVectorState.diagonal) {
-      // MY + q1/2/3/4 = 35 59
-      mOutputState.leftStickX = 128 + (mVectorState.directionX * 35);
-      mOutputState.leftStickY = 128 + (mVectorState.directionY * 53);
-      if (shield_button_pressed) {
-        // MY + L, R, LS, and MS + q1/2 = 38 70
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 38);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 70);
-        // MY + L, R, LS, and MS + q3/4 = 40 68
-        if (mVectorState.directionX == -1) {
-          mOutputState.leftStickX = 128 + (mVectorState.directionX * 40);
-          mOutputState.leftStickY = 128 + (mVectorState.directionY * 68);
+        // Angled fsmash/ftilt with C-Stick + MX
+        if (directions.cx != 0) {
+            outputs.rightStickX = 128 + (directions.cx * 127);
+            outputs.rightStickY = 128 + (directions.y * 59);
         }
-      }
+
+        /* Up B angles */
+        if (directions.diagonal && !shield_button_pressed) {
+            // (33.44) = 53 35
+            outputs.leftStickX = 128 + (directions.x * 53);
+            outputs.leftStickY = 128 + (directions.y * 35);
+            // (39.05) = 53 43
+            if (inputs.c_down) {
+                outputs.leftStickX = 128 + (directions.x * 53);
+                outputs.leftStickY = 128 + (directions.y * 43);
+            }
+            // (36.35) = 53 39
+            if (inputs.c_left) {
+                outputs.leftStickX = 128 + (directions.x * 53);
+                outputs.leftStickY = 128 + (directions.y * 39);
+            }
+            // (30.32) = 56 41
+            if (inputs.c_up) {
+                outputs.leftStickX = 128 + (directions.x * 53);
+                outputs.leftStickY = 128 + (directions.y * 31);
+            }
+            // (27.85) = 49 42
+            if (inputs.c_right) {
+                outputs.leftStickX = 128 + (directions.x * 53);
+                outputs.leftStickY = 128 + (directions.y * 28);
+            }
+
+            /* Extended Up B Angles */
+            if (inputs.b) {
+                // (33.29) = 67 44
+                outputs.leftStickX = 128 + (directions.x * 67);
+                outputs.leftStickY = 128 + (directions.y * 44);
+                // (39.38) = 67 55
+                if (inputs.c_down) {
+                    outputs.leftStickX = 128 + (directions.x * 67);
+                    outputs.leftStickY = 128 + (directions.y * 55);
+                }
+                // (36.18) = 67 49
+                if (inputs.c_left) {
+                    outputs.leftStickX = 128 + (directions.x * 67);
+                    outputs.leftStickY = 128 + (directions.y * 49);
+                }
+                // (30.2) = 67 39
+                if (inputs.c_up) {
+                    outputs.leftStickX = 128 + (directions.x * 67);
+                    outputs.leftStickY = 128 + (directions.y * 39);
+                }
+                // (27.58) = 67 35
+                if (inputs.c_right) {
+                    outputs.leftStickX = 128 + (directions.x * 67);
+                    outputs.leftStickY = 128 + (directions.y * 35);
+                }
+            }
+
+            // Angled Ftilts
+            if (inputs.a) {
+                outputs.leftStickX = 128 + (directions.x * 36);
+                outputs.leftStickY = 128 + (directions.y * 26);
+            }
+        }
     }
 
-    /* Up B angles */
-    if (mVectorState.diagonal && !shield_button_pressed) {
-      // (56.56) = 35 53
-      mOutputState.leftStickX = 128 + (mVectorState.directionX * 35);
-      mOutputState.leftStickY = 128 + (mVectorState.directionY * 53);
-      // (50.95) = 43 53
-      if (mrInputState.c_down) {
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 43);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 53);
-      }
-      // (53.65) = 39 53
-      if (mrInputState.c_left) {
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 49);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 53);
-      }
-      // (59.68) = 31 53
-      if (mrInputState.c_up) {
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 31);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 53);
-      }
-      // (62.15) = 28 53
-      if (mrInputState.c_right) {
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 28);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 53);
-      }
+    if (inputs.mod_y) {
+        // MY + Horizontal (even if shield is held) = 41
+        if (directions.horizontal) {
+            outputs.leftStickX = 128 + (directions.x * 41);
+            // MY Horizontal Tilts
+            if (inputs.a) {
+                outputs.leftStickX = 128 + (directions.x * 36);
+            }
+        }
+        // MY + Vertical (even if shield is held) = 53
+        if (directions.vertical) {
+            outputs.leftStickY = 128 + (directions.y * 53);
+            // MY Vertical Tilts
+            if (inputs.a) {
+                outputs.leftStickY = 128 + (directions.y * 36);
+            }
+        }
+        if (directions.diagonal) {
+            // MY + q1/2/3/4 = 35 59
+            outputs.leftStickX = 128 + (directions.x * 35);
+            outputs.leftStickY = 128 + (directions.y * 53);
+            if (shield_button_pressed) {
+                // MY + L, R, LS, and MS + q1/2 = 38 70
+                outputs.leftStickX = 128 + (directions.x * 38);
+                outputs.leftStickY = 128 + (directions.y * 70);
+                // MY + L, R, LS, and MS + q3/4 = 40 68
+                if (directions.x == -1) {
+                    outputs.leftStickX = 128 + (directions.x * 40);
+                    outputs.leftStickY = 128 + (directions.y * 68);
+                }
+            }
+        }
 
-      /* Extended Up B Angles */
-      if (mrInputState.b) {
-        // (56.71) = 44 67
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 44);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 67);
-        // (50.62) = 55 67
-        if (mrInputState.c_down) {
-          mOutputState.leftStickX = 128 + (mVectorState.directionX * 55);
-          mOutputState.leftStickY = 128 + (mVectorState.directionY * 67);
-        }
-        // (53.82) = 49 67
-        if (mrInputState.c_left) {
-          mOutputState.leftStickX = 128 + (mVectorState.directionX * 49);
-          mOutputState.leftStickY = 128 + (mVectorState.directionY * 67);
-        }
-        // (59.8) = 39 67
-        if (mrInputState.c_up) {
-          mOutputState.leftStickX = 128 + (mVectorState.directionX * 39);
-          mOutputState.leftStickY = 128 + (mVectorState.directionY * 67);
-        }
-        // (62.42) = 35 67
-        if (mrInputState.c_right) {
-          mOutputState.leftStickX = 128 + (mVectorState.directionX * 35);
-          mOutputState.leftStickY = 128 + (mVectorState.directionY * 67);
-        }
-      }
+        /* Up B angles */
+        if (directions.diagonal && !shield_button_pressed) {
+            // (56.56) = 35 53
+            outputs.leftStickX = 128 + (directions.x * 35);
+            outputs.leftStickY = 128 + (directions.y * 53);
+            // (50.95) = 43 53
+            if (inputs.c_down) {
+                outputs.leftStickX = 128 + (directions.x * 43);
+                outputs.leftStickY = 128 + (directions.y * 53);
+            }
+            // (53.65) = 39 53
+            if (inputs.c_left) {
+                outputs.leftStickX = 128 + (directions.x * 49);
+                outputs.leftStickY = 128 + (directions.y * 53);
+            }
+            // (59.68) = 31 53
+            if (inputs.c_up) {
+                outputs.leftStickX = 128 + (directions.x * 31);
+                outputs.leftStickY = 128 + (directions.y * 53);
+            }
+            // (62.15) = 28 53
+            if (inputs.c_right) {
+                outputs.leftStickX = 128 + (directions.x * 28);
+                outputs.leftStickY = 128 + (directions.y * 53);
+            }
 
-      // MY Pivot Uptilt/Dtilt
-      if (mrInputState.a) {
-        mOutputState.leftStickX = 128 + (mVectorState.directionX * 34);
-        mOutputState.leftStickY = 128 + (mVectorState.directionY * 38);
-      }
+            /* Extended Up B Angles */
+            if (inputs.b) {
+                // (56.71) = 44 67
+                outputs.leftStickX = 128 + (directions.x * 44);
+                outputs.leftStickY = 128 + (directions.y * 67);
+                // (50.62) = 55 67
+                if (inputs.c_down) {
+                    outputs.leftStickX = 128 + (directions.x * 55);
+                    outputs.leftStickY = 128 + (directions.y * 67);
+                }
+                // (53.82) = 49 67
+                if (inputs.c_left) {
+                    outputs.leftStickX = 128 + (directions.x * 49);
+                    outputs.leftStickY = 128 + (directions.y * 67);
+                }
+                // (59.8) = 39 67
+                if (inputs.c_up) {
+                    outputs.leftStickX = 128 + (directions.x * 39);
+                    outputs.leftStickY = 128 + (directions.y * 67);
+                }
+                // (62.42) = 35 67
+                if (inputs.c_right) {
+                    outputs.leftStickX = 128 + (directions.x * 35);
+                    outputs.leftStickY = 128 + (directions.y * 67);
+                }
+            }
+
+            // MY Pivot Uptilt/Dtilt
+            if (inputs.a) {
+                outputs.leftStickX = 128 + (directions.x * 34);
+                outputs.leftStickY = 128 + (directions.y * 38);
+            }
+        }
     }
-  }
 
-  // C-stick ASDI Slideoff angle overrides any other C-stick modifiers (such as
-  // angled fsmash).
-  if (mVectorState.directionCX != 0 && mVectorState.directionCY != 0) {
-    // 5250 8500 = 42 68
-    mOutputState.rightStickX = 128 + (mVectorState.directionCX * 42);
-    mOutputState.rightStickY = 128 + (mVectorState.directionCY * 68);
-  }
+    // C-stick ASDI Slideoff angle overrides any other C-stick modifiers (such as
+    // angled fsmash).
+    if (directions.cx != 0 && directions.cy != 0) {
+        // 5250 8500 = 42 68
+        outputs.rightStickX = 128 + (directions.cx * 42);
+        outputs.rightStickY = 128 + (directions.cy * 68);
+    }
 
-  // Horizontal SOCD overrides X-axis modifiers (for ledgedash maximum jump
-  // trajectory).
-  if (mHorizontalSocd && !mVectorState.vertical) {
-    mOutputState.leftStickX = 128 + (mVectorState.directionX * 100);
-  }
+    if (inputs.l) {
+        outputs.triggerLAnalog = 140;
+    }
 
-  if (mrInputState.l) {
-    mOutputState.triggerLAnalog = 140;
-  }
+    if (inputs.r) {
+        outputs.triggerRAnalog = 140;
+    }
 
-  if (mrInputState.r) {
-    mOutputState.triggerRAnalog = 140;
-  }
+    // Shut off c-stick when using dpad layer.
+    if (inputs.mod_x && inputs.mod_y) {
+        outputs.rightStickX = 128;
+        outputs.rightStickY = 128;
+    }
 
-  // Shut off c-stick when using dpad layer.
-  if (mrInputState.mod_x && mrInputState.mod_y) {
-    mOutputState.rightStickX = 128;
-    mOutputState.rightStickY = 128;
-  }
+    // Nunchuk overrides left stick.
+    if (inputs.nunchuk_connected) {
+        outputs.leftStickX = inputs.nunchuk_x;
+        outputs.leftStickY = inputs.nunchuk_y;
+    }
 }
