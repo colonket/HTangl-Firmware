@@ -27,6 +27,8 @@ void RetroMode::UpdateDigitalOutputs(InputState &inputs, OutputState &outputs) {
     outputs.x = inputs.z;
     outputs.buttonR = inputs.up;
     outputs.buttonL = inputs.l;
+    outputs.triggerRDigital = inputs.r;
+    outputs.triggerLDigital = inputs.y;
 }
 
 void RetroMode::UpdateAnalogOutputs(InputState &inputs, OutputState &outputs) {
