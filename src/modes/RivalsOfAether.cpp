@@ -156,6 +156,14 @@ void RivalsOfAether::UpdateAnalogOutputs(InputState &inputs, OutputState &output
         }
     }
 
+    if (outputs.triggerLDigital) {
+        outputs.triggerLAnalog = 140;
+    }
+
+    if (outputs.triggerRDigital) {
+        outputs.triggerRAnalog = 140;
+    }
+
     // Shut off c-stick when using dpad layer.
     if (inputs.mod_x && inputs.mod_y) {
         outputs.rightStickX = 128;
