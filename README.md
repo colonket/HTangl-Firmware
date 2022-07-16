@@ -9,6 +9,6 @@ Full guide coming soon, please go to the [HTangl Discord](https://discord.gg/yAe
 
 ## DIDIY V0 owners ##
 
-To update your board go to the [releases section](https://github.com/HTangl/HTangl-Firmware/releases) and download the "DIDIY.V0.uf2" file by clicking on it.  
+To update your board go to the [releases section](https://github.com/HTangl/HTangl-Firmware/releases) and download the "DIDIY-V0.uf2" file by clicking on it.  
 Plug your controller into your computer while holding the C-Right button, a new drive should show up called "RPI-RP2".  
 Drag and drop the uf2 file onto that drive, it will immediately disconnect and then reconnect, the drive will disappear and your controller will be updated.
