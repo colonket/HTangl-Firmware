@@ -4,9 +4,6 @@ This is an edited version of the HayBox firmware created by [Haystack](https://g
 
 Many features have been removed/added/modified to make the firmware more straightforward to use on HTangl controllers as well as the DIDIY.
 
-Guide is incomplete, still need to add instructions for remapping, please go to the [HTangl Discord](https://discord.gg/yAeFsbCDpv) if you need help using this firmware
-
-
 ## How to update DIDIY V0/V1
 
 1. Go to the [releases section](https://github.com/HTangl/HTangl-Firmware/releases) and download the latest uf2 file that correlates to your DIDIY board version, if your board doesn’t have a version number you have a V0. You do not need to download the source code zip file.
