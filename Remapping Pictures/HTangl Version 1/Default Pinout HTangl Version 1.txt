@@ -1,0 +1,38 @@
+GpioButtonMapping button_mappings[] = {
+    {&InputState::l,            6 },
+    { &InputState::left,        4 },
+    { &InputState::down,        0 },
+    { &InputState::right,       1 },
+
+    { &InputState::mod_x,       14},
+    { &InputState::mod_y,       16},
+
+    { &InputState::select,      2 },
+    { &InputState::start,       3 },
+    { &InputState::home,        5 },
+
+    { &InputState::c_left,      A2},
+    { &InputState::c_up,        A3},
+    { &InputState::c_down,      15},
+    { &InputState::a,           A5},
+    { &InputState::c_right,     A4},
+
+    { &InputState::b,           7 },
+    { &InputState::x,           9 },
+    { &InputState::z,           12},
+    { &InputState::up,          A0},
+
+    { &InputState::r,           10},
+    { &InputState::y,           11},
+    { &InputState::lightshield, 13},
+    { &InputState::midshield,   A1},
+};
+size_t button_count = sizeof(button_mappings) / sizeof(GpioButtonMapping);
+
+Pinout pinout = {
+    .joybus_data = 8,
+    .mux = -1,
+    .nunchuk_detect = -1,
+    .nunchuk_sda = -1,
+    .nunchuk_scl = -1,
+};
