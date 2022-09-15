@@ -23,9 +23,15 @@ void Ultimate::UpdateDigitalOutputs(InputState &inputs, OutputState &outputs) {
     outputs.buttonR = inputs.z;
     outputs.buttonL = inputs.lightshield;
     outputs.triggerRDigital = inputs.r;
-    outputs.start = inputs.start;
     outputs.select = inputs.select;
     outputs.home = inputs.home;
+
+    // For controllers with only 1 menu button Select/Home can be accessed with MX or MY + Start
+    if (inputs.mod_x)
+    {outputs.select = inputs.start;}
+    else if (inputs.mod_y)
+    {outputs.home = inputs.start;}
+    else {outputs.start = inputs.start;}
 
     // If nunchuk is connected disable L and assign it to the Nunchuk Z button
     if (inputs.nunchuk_connected) 
