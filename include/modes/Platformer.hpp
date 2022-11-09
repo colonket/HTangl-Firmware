@@ -1,13 +1,13 @@
-#ifndef _MODES_RETROMODE_HPP
-#define _MODES_RETROMODE_HPP
+#ifndef _MODES_PLATFORMER_HPP
+#define _MODES_PLATFORMER_HPP
 
 #include "core/ControllerMode.hpp"
 #include "core/socd.hpp"
 #include "core/state.hpp"
 
-class RetroMode : public ControllerMode {
+class Platformer : public ControllerMode {
   public:
-    RetroMode(socd::SocdType socd_type);
+    Platformer(socd::SocdType socd_type);
 
   private:
     void UpdateDigitalOutputs(InputState &inputs, OutputState &outputs);

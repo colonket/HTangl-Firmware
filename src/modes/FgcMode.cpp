@@ -22,9 +22,15 @@ void FgcMode::UpdateDigitalOutputs(InputState &inputs, OutputState &outputs) {
     outputs.dpadUp = inputs.mod_x || inputs.a;
 
     // Menu keys
-    outputs.start = inputs.start;
     outputs.select = inputs.select;
     outputs.home = inputs.home;
+
+    // For controllers with only 1 menu button Select/Home can be accessed with MX or MY + Start
+    if (inputs.mod_x)
+    {outputs.select = inputs.start;}
+    else if (inputs.mod_y)
+    {outputs.home = inputs.start;}
+    else {outputs.start = inputs.start;}
 
     // Right hand top row (home row)
     outputs.x = inputs.b;

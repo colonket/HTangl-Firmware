@@ -58,6 +58,10 @@ Pinout pinout = {
 };
 
 void setup() {
+    // Create Nunchuk input source - must be done before GPIO input source otherwise it would
+    // disable the pullups on the i2c pins.
+    NunchukInput *nunchuk = new NunchukInput();
+
     // Create GPIO input source and use it to read button states for checking button holds.
     GpioButtonInput *gpio_input = new GpioButtonInput(button_mappings, button_count);
 
@@ -65,7 +69,7 @@ void setup() {
     gpio_input->UpdateInputs(button_holds);
 
     // Create array of input sources to be used.
-    static InputSource *input_sources[] = { gpio_input };
+    static InputSource *input_sources[] = { gpio_input, nunchuk };
     size_t input_source_count = sizeof(input_sources) / sizeof(InputSource *);
 
     CommunicationBackend *primary_backend = new DInputBackend(input_sources, input_source_count);
@@ -98,7 +102,9 @@ void setup() {
     }
 
     // Default to Melee mode.
-    primary_backend->SetGameMode(new Melee20Button(socd::SOCD_2IP_NO_REAC));
+    primary_backend->SetGameMode(
+        new Melee20Button(socd::SOCD_2IP_NO_REAC, { .crouch_walk_os = false })
+    );
 }
 
 void loop() {
