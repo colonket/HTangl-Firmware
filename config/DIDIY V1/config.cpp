@@ -85,6 +85,16 @@ void setup() {
 
     ConnectedConsole console = detect_console(pinout.joybus_data);
 
+    /*
+    The below code has been modified for personal prefernces
+    USB behavior is left the same
+    GCC behavior:
+        * Now defaults to Ultimate mode
+            ** Assumes you're going to be plugging into a GCC adapter to play Ultimate
+        * Hold B to start with Melee mode
+        * Hold X to start with ProjectM/Project+ mode
+    */
+
     /* Select communication backend. */
     CommunicationBackend *primary_backend;
     if (console == ConnectedConsole::NONE) {
@@ -97,7 +107,7 @@ void setup() {
 
             // Default to Ultimate mode on Switch.
             primary_backend->SetGameMode(new Ultimate(socd::SOCD_2IP));
-            return;
+            return; // If we don't return here, then gamemode will switch to Melee
         } else if (button_holds.z) {
             // If no console detected and Z is held on plugin then use DInput backend.
             TUGamepad::registerDescriptor();
@@ -117,8 +127,7 @@ void setup() {
         }
     } else {
         if (console == ConnectedConsole::GAMECUBE) {
-            primary_backend =
-                new GamecubeBackend(input_sources, input_source_count, pinout.joybus_data);
+            primary_backend = new GamecubeBackend(input_sources, input_source_count, pinout.joybus_data);
         } else if (console == ConnectedConsole::N64) {
             primary_backend = new N64Backend(input_sources, input_source_count, pinout.joybus_data);
         }
@@ -126,7 +135,26 @@ void setup() {
         // If console then only using 1 backend (no input viewer).
         backend_count = 1;
         backends = new CommunicationBackend *[backend_count] { primary_backend };
+
+        if (button_holds.b) {
+            // Hold B for Melee
+            primary_backend->SetGameMode(
+                new Melee20Button(socd::SOCD_2IP_NO_REAC, { .crouch_walk_os = false })
+            );
+            return;
+        } if (button_holds.x) {
+            // Hold X for Project+
+            primary_backend->SetGameMode(
+                new ProjectM(socd::SOCD_2IP_NO_REAC, { .true_z_press = false, .ledgedash_max_jump_traj = true })
+            );
+            return;
+        } else {
+            // Default to Ultimate mode on Gamecube Adapter
+            primary_backend->SetGameMode(new Ultimate(socd::SOCD_2IP));
+            return;
+        }
     }
+
 
     // Default to Melee mode.
     primary_backend->SetGameMode(
