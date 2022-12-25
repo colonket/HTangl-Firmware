@@ -2,6 +2,7 @@
 #define _CONFIG_MODE_SELECTION_HPP
 
 #include "core/state.hpp"
+#include "modes/DoomKeyboardMode.hpp"
 #include "modes/DefaultKeyboardMode.hpp"
 #include "modes/FgcMode.hpp"
 #include "modes/Melee20Button.hpp"
@@ -45,6 +46,7 @@ void select_mode(CommunicationBackend *backend) {
         if (inputs.l) {set_mode(backend, new DefaultKeyboardMode(socd::SOCD_2IP));}
         else if (inputs.left) {set_mode(backend, new RivalsOfAether(socd::SOCD_2IP));}
         else if (inputs.down) {set_mode(backend, new Platformer(socd::SOCD_2IP));}
+        else if (inputs.right) {set_mode(backend, new DoomKeyboardMode(socd::SOCD_2IP));} // Prepare for DOOOOOOM
     }
 }
 
