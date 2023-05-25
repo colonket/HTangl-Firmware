@@ -20,21 +20,23 @@ void RivalsOfAether::UpdateDigitalOutputs(InputState &inputs, OutputState &outpu
     outputs.x = inputs.x;
     outputs.y = inputs.y;
     outputs.buttonR = inputs.z;
-    if (inputs.nunchuk_connected) {
-        // Lightshield with C button.
-        if (inputs.nunchuk_c) {
-            outputs.triggerLAnalog = 49;
-        }
-        outputs.triggerLDigital = inputs.nunchuk_z;
-    } else {
-        outputs.triggerLDigital = inputs.l;
-    }
     outputs.triggerRDigital = inputs.r;
-    outputs.start = inputs.start;
     outputs.select = inputs.select;
     outputs.home = inputs.home;
-    outputs.leftStickClick = inputs.lightshield;
+    outputs.buttonL = inputs.lightshield;
     outputs.rightStickClick = inputs.midshield;
+
+    // For controllers with only 1 menu button Select/Home can be accessed with MX or MY + Start
+    if (inputs.mod_x)
+    {outputs.select = inputs.start;}
+    else if (inputs.mod_y)
+    {outputs.home = inputs.start;}
+    else {outputs.start = inputs.start;}
+
+    // If Nunchuk is connected lightshield with C button
+    if (inputs.nunchuk_connected) {
+    if (inputs.nunchuk_c) {outputs.triggerLAnalog = 49;} outputs.triggerLDigital = inputs.nunchuk_z;} 
+    else {outputs.triggerLDigital = inputs.l;}
 
     // Activate D-Pad layer by holding Mod X + Mod Y.
     if (inputs.mod_x && inputs.mod_y) {
@@ -128,7 +130,7 @@ void RivalsOfAether::UpdateAnalogOutputs(InputState &inputs, OutputState &output
             // Angles just for DI
             if (inputs.c_left) {
                 outputs.leftStickX = 128 + (directions.x * 44);
-                outputs.leftStickY = 128 + (directions.y * 74);
+                outputs.leftStickY = 128 + (directions.y * 90);
             }
       
             if (inputs.c_up) {
