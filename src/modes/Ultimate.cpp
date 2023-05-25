@@ -20,16 +20,29 @@ void Ultimate::UpdateDigitalOutputs(InputState &inputs, OutputState &outputs) {
     outputs.b = inputs.b;
     outputs.x = inputs.x;
     outputs.y = inputs.y;
+    outputs.buttonR = inputs.z;
     outputs.buttonL = inputs.lightshield;
-    outputs.buttonR = inputs.z || inputs.midshield;
-    outputs.triggerLDigital = inputs.l;
     outputs.triggerRDigital = inputs.r;
-    outputs.start = inputs.start;
     outputs.select = inputs.select;
     outputs.home = inputs.home;
 
-    // Turn on D-Pad layer by holding Mod X + Mod Y or Nunchuk C button.
-    if ((inputs.mod_x && inputs.mod_y) || inputs.nunchuk_c) {
+    // For controllers with only 1 menu button Select/Home can be accessed with MX or MY + Start
+    if (inputs.mod_x)
+    {outputs.select = inputs.start;}
+    else if (inputs.mod_y)
+    {outputs.home = inputs.start;}
+    else {outputs.start = inputs.start;}
+
+    // If nunchuk is connected disable L and assign it to the Nunchuk Z button
+    if (inputs.nunchuk_connected) 
+    {outputs.triggerLDigital = inputs.nunchuk_z;} 
+    else 
+    {outputs.triggerLDigital = inputs.l;}
+
+    // D-Pad layer can be activated by holding Mod X + Mod Y, or by holding the C
+    // button on a nunchuk.
+    if ((inputs.mod_x && inputs.mod_y) || inputs.nunchuk_c) 
+    {
         outputs.dpadUp = inputs.c_up;
         outputs.dpadDown = inputs.c_down;
         outputs.dpadLeft = inputs.c_left;
@@ -54,7 +67,7 @@ void Ultimate::UpdateAnalogOutputs(InputState &inputs, OutputState &outputs) {
         outputs
     );
 
-    bool shield_button_pressed = inputs.l || inputs.r;
+    bool shield_button_pressed = inputs.l || inputs.r || inputs.lightshield || inputs.midshield;
 
     if (inputs.mod_x) {
         // MX + Horizontal = 6625 = 53
@@ -265,8 +278,8 @@ void Ultimate::UpdateAnalogOutputs(InputState &inputs, OutputState &outputs) {
         outputs.triggerRAnalog = 140;
     }
 
-    // Shut off C-stick when using D-Pad layer.
-    if ((inputs.mod_x && inputs.mod_y) || inputs.nunchuk_c) {
+    // Shut off c-stick when using dpad layer.
+    if (inputs.mod_x && inputs.mod_y) {
         outputs.rightStickX = 128;
         outputs.rightStickY = 128;
     }
