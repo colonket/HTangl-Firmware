@@ -32,9 +32,9 @@ GpioButtonMapping button_mappings[] = {
     { &InputState::mod_x,       11},
     { &InputState::mod_y,       10},
 
-    { &InputState::select,      20},
+    //{ &InputState::select,      20},
     { &InputState::start,       21},
-    { &InputState::home,        19},
+    //{ &InputState::home,        19},
 
     { &InputState::c_left,      22},
     { &InputState::c_up,        7 },
@@ -88,27 +88,8 @@ void setup() {
     /* Select communication backend. */
     CommunicationBackend *primary_backend;
     if (console == ConnectedConsole::NONE) {
-        if (button_holds.x) {
-            // If no console detected and X is held on plugin then use Switch USB backend.
-            NintendoSwitchBackend::RegisterDescriptor();
-            backend_count = 1;
-            primary_backend = new NintendoSwitchBackend(input_sources, input_source_count);
-            backends = new CommunicationBackend *[backend_count] { primary_backend };
-
-            // Default to Ultimate mode on Switch.
-            primary_backend->SetGameMode(new Ultimate(socd::SOCD_2IP));
-            return;
-        } else if (button_holds.z) {
-            // If no console detected and Z is held on plugin then use DInput backend.
-            TUGamepad::registerDescriptor();
-            TUKeyboard::registerDescriptor();
-            backend_count = 2;
-            primary_backend = new DInputBackend(input_sources, input_source_count);
-            backends = new CommunicationBackend *[backend_count] {
-                primary_backend, new B0XXInputViewer(input_sources, input_source_count)
-            };
-        } else if (button_holds.b) {
-            // Hold B for XInput with Rivals Mode
+        if (button_holds.b) {
+            // USB + Hold B == XInput in Rivals of Aether Mode
             backend_count = 2;
             primary_backend = new XInputBackend(input_sources, input_source_count);
             backends = new CommunicationBackend *[backend_count] {
@@ -117,6 +98,25 @@ void setup() {
 
             primary_backend->SetGameMode(new RivalsOfAether(socd::SOCD_2IP));
         
+            return;
+        } else if (button_holds.x) {
+            // USB + Hold X == Nintendo Switch Backend in Ultimate Mode
+            NintendoSwitchBackend::RegisterDescriptor();
+            backend_count = 1;
+            primary_backend = new NintendoSwitchBackend(input_sources, input_source_count);
+            backends = new CommunicationBackend *[backend_count] { primary_backend };
+
+            primary_backend->SetGameMode(new Ultimate(socd::SOCD_2IP));
+            return;
+        } else if (button_holds.z) {
+            // USB + Hold Z == DInput
+            TUGamepad::registerDescriptor();
+            TUKeyboard::registerDescriptor();
+            backend_count = 2;
+            primary_backend = new DInputBackend(input_sources, input_source_count);
+            backends = new CommunicationBackend *[backend_count] {
+                primary_backend, new B0XXInputViewer(input_sources, input_source_count)
+            };
             return;
         } else {
             // Default to XInput mode if no console detected and no other mode forced.
@@ -139,20 +139,18 @@ void setup() {
         backends = new CommunicationBackend *[backend_count] { primary_backend };
 
         if (button_holds.b) {
-            // Hold B for Melee
-            primary_backend->SetGameMode(
-                new Melee20Button(socd::SOCD_2IP_NO_REAC, { .crouch_walk_os = false })
-            );
+            // GCC + Hold B ==  Rivals
+            primary_backend->SetGameMode(new RivalsOfAether(socd::SOCD_2IP));
             return;
-        } if (button_holds.x) {
-            // Hold X for Project+
+        } else if (button_holds.x) {
+            //  GCC + Hold X ==  Ultimate
+            primary_backend->SetGameMode(new Ultimate(socd::SOCD_2IP));
+            return;
+        } else if (button_holds.z) {
+            // GCC + Hold Z == Project+
             primary_backend->SetGameMode(
                 new ProjectM(socd::SOCD_2IP_NO_REAC, { .true_z_press = false, .ledgedash_max_jump_traj = true })
             );
-            return;
-        } else {
-            // Default to Ultimate mode on Gamecube Adapter
-            primary_backend->SetGameMode(new Ultimate(socd::SOCD_2IP));
             return;
         }
     }
