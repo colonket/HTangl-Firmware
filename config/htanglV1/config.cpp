@@ -107,6 +107,17 @@ void setup() {
             backends = new CommunicationBackend *[backend_count] {
                 primary_backend, new B0XXInputViewer(input_sources, input_source_count)
             };
+        } else if (button_holds.b) {
+            // Hold B for XInput with Rivals Mode
+            backend_count = 2;
+            primary_backend = new XInputBackend(input_sources, input_source_count);
+            backends = new CommunicationBackend *[backend_count] {
+                primary_backend, new B0XXInputViewer(input_sources, input_source_count)
+            };
+
+            primary_backend->SetGameMode(new RivalsOfAether(socd::SOCD_2IP));
+        
+            return;
         } else {
             // Default to XInput mode if no console detected and no other mode forced.
             backend_count = 2;
@@ -126,6 +137,24 @@ void setup() {
         // If console then only using 1 backend (no input viewer).
         backend_count = 1;
         backends = new CommunicationBackend *[backend_count] { primary_backend };
+
+        if (button_holds.b) {
+            // Hold B for Melee
+            primary_backend->SetGameMode(
+                new Melee20Button(socd::SOCD_2IP_NO_REAC, { .crouch_walk_os = false })
+            );
+            return;
+        } if (button_holds.x) {
+            // Hold X for Project+
+            primary_backend->SetGameMode(
+                new ProjectM(socd::SOCD_2IP_NO_REAC, { .true_z_press = false, .ledgedash_max_jump_traj = true })
+            );
+            return;
+        } else {
+            // Default to Ultimate mode on Gamecube Adapter
+            primary_backend->SetGameMode(new Ultimate(socd::SOCD_2IP));
+            return;
+        }
     }
 
     // Default to Melee mode.
