@@ -31,7 +31,8 @@ void Ultimate::UpdateDigitalOutputs(InputState &inputs, OutputState &outputs) {
     {outputs.select = inputs.start;}
     else if (inputs.mod_y)
     {outputs.home = inputs.start;}
-    else {outputs.start = inputs.start;}
+    else
+    {outputs.start = inputs.start;}
 
     // If nunchuk is connected disable L and assign it to the Nunchuk Z button
     if (inputs.nunchuk_connected) 
