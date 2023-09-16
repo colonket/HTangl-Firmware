@@ -152,13 +152,24 @@ void setup() {
                 new ProjectM(socd::SOCD_2IP_NO_REAC, { .true_z_press = false, .ledgedash_max_jump_traj = true })
             );
             return;
+        } else if (button_holds.up) {
+            // GCC + Hold Up == Melee
+            primary_backend->SetGameMode(
+                new Melee20Button(socd::SOCD_2IP_NO_REAC, { .crouch_walk_os = false })
+            );
+            return;
         }
     }
 
+    // Default to Ultimate Mode
+    primary_backend->SetGameMode(new Ultimate(socd::SOCD_2IP));
+
+    /**
     // Default to Melee mode.
     primary_backend->SetGameMode(
         new Melee20Button(socd::SOCD_2IP_NO_REAC, { .crouch_walk_os = false })
     );
+    */
 }
 
 void loop() {
